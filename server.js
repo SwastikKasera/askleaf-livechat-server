@@ -16,6 +16,20 @@ const io = new Server(httpServer, {
   }
 });
 
+app.get('/', (req, res) => {
+  res.status(200).json({
+    status: 'ok',
+    message: 'Server is running'
+  });
+});
+app.get('/ping', (req, res) => {
+  res.status(200).json({
+    status: 'ok',
+    message: 'Server is running',
+    timestamp: new Date().toISOString()
+  });
+});
+
 const supabase = createClient(
   process.env.SUPABASE_DB_URL,
   process.env.SUPABASE_DB_PASSWORD
@@ -215,7 +229,6 @@ setInterval(() => {
       sessions.conversations.delete(convId);
     }
   }
-  console.log("interval run")
   io.emit('chat:updated', Array.from(sessions.conversations.values()));
 }, 5 * 60 * 1000);
 
