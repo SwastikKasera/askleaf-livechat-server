@@ -74,7 +74,7 @@ async function loadActiveConversations() {
         convId: conv.live_chat_id,
         chatbotId: conv.chatbot_id,
         customerName: conv.customer_name,
-        lastActive: conv.created_at,
+        timestamp: conv.created_at,
         lastMessage: conv.live_message?.messages?.slice(-1)[0] || null
       });
     });
@@ -122,7 +122,7 @@ io.on('connection', (socket) => {
           convId,
           chatbotId,
           customerEmail,
-          lastActive: new Date(),
+          timestamp: new Date(),
           lastMessage: null
         });
       }
@@ -191,7 +191,7 @@ io.on('connection', (socket) => {
       const conversation = sessions.conversations.get(convId);
       if (conversation) {
         conversation.lastMessage = message;
-        conversation.lastActive = new Date();
+        conversation.timestamp = new Date();
         io.emit('chat:updated', Array.from(sessions.conversations.values()));
       }
 
@@ -225,7 +225,7 @@ setInterval(() => {
   const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
   
   for (const [convId, conv] of sessions.conversations) {
-    if (new Date(conv.lastActive) < oneHourAgo) {
+    if (new Date(conv.timestamp) < oneHourAgo) {
       sessions.conversations.delete(convId);
     }
   }
